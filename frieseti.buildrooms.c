@@ -17,6 +17,16 @@
 #include <string.h>
 
 void makeDirectory();
+
+//room struct
+struct room {
+	int id;
+	char* name;
+	int numConnect;
+	struct room* outConnections[6];
+};
+
+
 /*********************************************************************************
  *Function: main								 *
  * Description:  *
