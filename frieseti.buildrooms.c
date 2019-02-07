@@ -73,7 +73,7 @@ void makeFile(char* dname){
 	//memset(rmname, '\0', 9);
 
 	//set pointers in array to room names
-	for(i; i < 7; i++)
+	for(i; i < 10; i++)
 	{
 		switch (i)
 		{
@@ -99,8 +99,17 @@ void makeFile(char* dname){
 			case 6:
 				printf("case%d\n", i);
 				break;
-		}	
-	
+			case 7:
+				printf("case%d\n", i);
+				break;
+			case 8:
+				printf("case%d\n", i);
+				break; 	
+			case 9:
+				printf("case%d\n", i);
+				break;	
+		}
+
 	}
 	
 }
