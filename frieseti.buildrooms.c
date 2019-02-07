@@ -68,47 +68,62 @@ void makeDirectory(char* name){
  * Description: *
  *******************************************************************************/
 void makeFile(char* dname){
-	int i=0;
+	int file_descriptor, i=0;
 	char* rmname;
-	//memset(rmname, '\0', 9);
-
-	//set pointers in array to room names
+	char file[20] ;
+	memset(file, '\0', 20);
+		
+	//create room files
 	for(i; i < 10; i++)
 	{
+		memset(file, '\0', 20);
+		
+		//roomnames
 		switch (i)
 		{
 			case 0:
 				rmname = "Utopia";
-				printf("rmname for i=%d: %s\n", i, rmname);
 				break;
 			case 1:
-				printf("case%d\n", i);
+				rmname = "Notopia";
 				break; 	
 			case 2:
-				printf("case%d\n", i);
+				rmname = "Youtopia";
 				break; 
 			case 3:
-				printf("case%d\n", i);
+				rmname = "Mehtopia";
 				break; 	
 			case 4:
-				printf("case%d\n", i);
+				rmname = "Cattopia";
 				break;
 			case 5:
-				printf("case%d\n", i);
+				rmname = "Dogtopia";
 				break; 	
 			case 6:
-				printf("case%d\n", i);
+				rmname = "Bottopia";
 				break;
 			case 7:
-				printf("case%d\n", i);
+				rmname = "Dietopia";
 				break;
 			case 8:
-				printf("case%d\n", i);
+				rmname = "Mootopia";	
 				break; 	
 			case 9:
-				printf("case%d\n", i);
+				rmname = "Vimtopia";
 				break;	
 		}
+		
+		sprintf(file, "%s/%s", dname, rmname);
+		printf("file:%s\n", file);	
+
+		//file_descriptor = 
+		
+		//if(file_descriptor < 0)
+		//{
+		//	fprintf("Could not open %s\n", file);
+		//	exit(1);
+		//}
+
 
 	}
 	
