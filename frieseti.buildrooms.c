@@ -16,7 +16,9 @@
 #include <sys/stat.h>
 #include <string.h>
 
-void makeDirectory();
+void makeDirectory(char*);
+void makeFile(char*);
+void roomNames();
 
 //room struct
 struct room {
@@ -26,17 +28,23 @@ struct room {
 	struct room* outConnections[6];
 };
 
-
 /*********************************************************************************
  *Function: main								 *
  * Description:  *
  ********************************************************************************/
 int main(){
-	
-	//make new directory
-	makeDirectory();
+	char* dirname;	
+	//create and initialize array for directory name
+	dirname = malloc(20 * sizeof(char));
+	memset(dirname, '\0', 20);
+	//make new directory and generate files
+	makeDirectory(dirname);
+	//makeFile(dirname);
 
-	//generate room files in directory
+	//create room map
+
+	//free allocated mem
+	free(dirname);
 
 	return 0;
 }
@@ -45,17 +53,44 @@ int main(){
  *Function: makeDirectory								 *
  * Description:  *
  ********************************************************************************/
-void makeDirectory(){
-	int result, pid, i = 0;
-	char dirname[20];
+void makeDirectory(char* name){
+	int result, pid;
+	//char* dirname;
 
-	//initialize array
-	memset(dirname, '\0', 20);
-
+	//create and initialize array
+	//dirname = malloc(20 * sizeof(char));
+	//memset(dirname, '\0', 20);
+	
 	//get pid and append to directory name
 	pid = getpid();
-	sprintf(dirname, "frieseti.rooms.%d", pid);
+	sprintf(name, "frieseti.rooms.%d", pid);
 
 	//create directory
-	result = mkdir(dirname, 0755);
+	result = mkdir(name, 0755);
+	
+	//return dirname;
+}
+
+/********************************************************************************
+ *Function: makeFile								*
+ * Description: *
+ *******************************************************************************/
+void makeFile(char* dirname){
+	//int i=0;
+	//char* rmnames[7];
+	//memset(rmnames, '\0', 7);
+
+	//initialize array of ptrs to room names
+	//rmnames[0] = roomNames();
+	//printf("in makeFile() %s\n", rmnames[0]);
+	
+		
+}
+
+/********************************************************************************
+ *Function: *
+ * Description: *
+ *******************************************************************************/
+
+void roomNames(){
 }
