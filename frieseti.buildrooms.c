@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <fcntl.h>
 
 void makeDirectory(char*);
 void makeFile(char*);
@@ -114,16 +115,17 @@ void makeFile(char* dname){
 		}
 		
 		sprintf(file, "%s/%s", dname, rmname);
-		printf("file:%s\n", file);	
+		//printf("file:%s\n", file);	
 
-		//file_descriptor = 
+		file_descriptor = open(file, O_WRONLY | O_CREAT, 0600);
 		
-		//if(file_descriptor < 0)
-		//{
-		//	fprintf("Could not open %s\n", file);
-		//	exit(1);
-		//}
-
+		if(file_descriptor < 0)
+		{
+			//fprintf(stderr, "Could not open %s\n", file);
+			printf("Could not open %s\n", file);
+			exit(1);
+		}
+	
 
 	}
 	
