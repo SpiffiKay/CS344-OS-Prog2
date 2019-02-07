@@ -18,7 +18,6 @@
 
 void makeDirectory(char*);
 void makeFile(char*);
-void roomNames();
 
 //room struct
 struct room {
@@ -70,19 +69,39 @@ void makeDirectory(char* name){
  *******************************************************************************/
 void makeFile(char* dname){
 	int i=0;
-	char* rmnames[7];
-	memset(rmnames, '\0', 7);
+	char* rmname;
+	//memset(rmname, '\0', 9);
 
-	//initialize array of ptrs to room names
-	//rmnames[0] = roomNames();
+	//set pointers in array to room names
+	for(i; i < 7; i++)
+	{
+		switch (i)
+		{
+			case 0:
+				rmname = "Utopia";
+				printf("rmname for i=%d: %s\n", i, rmname);
+				break;
+			case 1:
+				printf("case%d\n", i);
+				break; 	
+			case 2:
+				printf("case%d\n", i);
+				break; 
+			case 3:
+				printf("case%d\n", i);
+				break; 	
+			case 4:
+				printf("case%d\n", i);
+				break;
+			case 5:
+				printf("case%d\n", i);
+				break; 	
+			case 6:
+				printf("case%d\n", i);
+				break;
+		}	
 	
-		
+	}
+	
 }
 
-/********************************************************************************
- *Function: *
- * Description: *
- *******************************************************************************/
-
-void roomNames(int i){
-}
