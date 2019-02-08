@@ -23,14 +23,18 @@ void MakeFile(char*);
 struct room AssignRoomName(struct room, int arr[]);
 void AddRandomConnection(struct room* arr[]);
 struct room GetRandomRoom(struct room* arr[]);
+int CanAddConnectionFrom(struct room x); 
+
+
+
 
 //room struct
 struct room {
 	int id;
 	char* name;
-	int numConnect;
-	char* roomType;
-	struct room* outConnections[6];
+	int cnct;
+	char* rtype;
+	struct room* outcncts[6];
 };
 
 /*********************************************************************************
@@ -256,13 +260,15 @@ void AddRandomConnection(struct room* rooms[])
 	a = GetRandomRoom(rooms);
 	printf("a: %s\n", a.name);
 //	while(true)
-//	{
-	
+//	{	
 		a = GetRandomRoom(rooms);
 		printf("a: %s\n", a.name);
 
-//		if (CanAddConnectionFrom(A) == true)
-//			 break;
+		if (CanAddConnectionFrom(a) == 1)
+		{	 
+			printf("in if, true is real!\n");
+			//break;
+		}
 //	}
 
 //	do
@@ -289,13 +295,21 @@ struct room GetRandomRoom(struct room* rooms[])
 	r = rand() % 7;
 	random = *rooms[r];
 	printf("random: %s\n", random.name);	
+
 	return random;
 }
 
 // Returns true if a connection can be added from Room x (< 6 outbound connections), false otherwise
-//bool CanAddConnectionFrom(Room x) 
-//{
-//}
+int CanAddConnectionFrom(struct room x) 
+{
+	int connect = 0;
+
+	//change bool to true if connections is <6
+	if(x.cnct < 6)
+		connect = 1;
+
+	return connect;
+}
 
 // Returns true if a connection from Room x to Room y already exists, false otherwise
 //bool ConnectionAlreadyExists(x, y)
