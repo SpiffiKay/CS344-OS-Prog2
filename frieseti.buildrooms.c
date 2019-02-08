@@ -23,8 +23,8 @@ void MakeFile(char*);
 struct room AssignRoomName(struct room, int arr[]);
 void AddRandomConnection(struct room* arr[]);
 struct room GetRandomRoom(struct room* arr[]);
-int CanAddConnectionFrom(struct room x); 
-
+int CanAddConnectionFrom(struct room); 
+int ConnectionAlreadyExists(struct room, struct room);
 
 
 
@@ -252,8 +252,7 @@ struct room AssignRoomName(struct room blank, int assigned[]){
  * Description: * Adds a random, valid outbound connection from a Room to
  *  another Room
  *******************************************************************************/
-void AddRandomConnection(struct room* rooms[])  
-{
+void AddRandomConnection(struct room* rooms[]){
 	struct room a;  
 	struct room b;
 
@@ -273,12 +272,16 @@ void AddRandomConnection(struct room* rooms[])
 
 //	do
 //	{
-//		B = GetRandomRoom();
+		b = GetRandomRoom(rooms);
+		printf("b: %s\n", b.name);
 //	}
 //	while(CanAddConnectionFrom(B) == false || IsSameRoom(A, B) == true || ConnectionAlreadyExists(A, B) == true);
 
+	ConnectionAlreadyExists(a,b);
+
 //	ConnectRoom(A, B);  // TODO: Add this connection to the real variables, 
 //	ConnectRoom(B, A);  //  because this A and B will be destroyed when this function terminates
+
 }
 
 /********************************************************************************
@@ -286,8 +289,7 @@ void AddRandomConnection(struct room* rooms[])
  * Description: *Returns a random Room, does NOT validate if connection can be 
  * added
  *******************************************************************************/
-struct room GetRandomRoom(struct room* rooms[])
-{
+struct room GetRandomRoom(struct room* rooms[]){
 	int r = 0;
 	struct room random;
 
@@ -299,22 +301,44 @@ struct room GetRandomRoom(struct room* rooms[])
 	return random;
 }
 
-// Returns true if a connection can be added from Room x (< 6 outbound connections), false otherwise
-int CanAddConnectionFrom(struct room x) 
-{
-	int connect = 0;
+/********************************************************************************
+ *Function: CanAddConnectionFrom						*
+ * Description: Returns true if a connection can be added from Room x (< 6 
+ * outbound connections), false otherwise
+ *******************************************************************************/
+int CanAddConnectionFrom(struct room x){
+	int cnct = 0;
 
 	//change bool to true if connections is <6
 	if(x.cnct < 6)
-		connect = 1;
+	{
+		cnct = 1;
+	}
 
-	return connect;
+	return cnct;
 }
 
-// Returns true if a connection from Room x to Room y already exists, false otherwise
-//bool ConnectionAlreadyExists(x, y)
-//{
-//}
+/*********************************************************************************
+ *Function: ConnectionAlreadyExists						 *
+ * Description: * Returns true if a connection from Room x to Room y already
+ * exists, false otherwise
+ ********************************************************************************/
+int ConnectionAlreadyExists(struct room x, struct room y){
+	int cnct = 0, i = 0;
+
+	for(i; i < y.cnct; i++)
+	{
+		//change bool to true if connection exists
+		if(x.id == y.outcncts[i]->id)
+		{
+			cnct = 1;
+			break;
+		}
+	}
+	
+	printf("In ConnectionAlreadyExists, cnct: %d\n", cnct);
+	return cnct;
+}
 
 // Connects Rooms x and y together, does not check if this connection is valid
 //void ConnectRoom(Room x, Room y) 
