@@ -16,9 +16,12 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <fcntl.h>
+#include <time.h>
 
-void makeDirectory(char*);
-void makeFile(char*);
+void MakeDirectory(char*);
+void MakeFile(char*);
+struct room AssignRoomName(struct room, int arr[]);
+
 
 //room struct
 struct room {
@@ -35,110 +38,89 @@ struct room {
  ********************************************************************************/
 int main(){
 	char dirname[20];	
+	int usednames[7];
 	memset(dirname, '\0', 20);
 
-	//make new directory and generate files
-	makeDirectory(dirname);
-	makeFile(dirname);
+	//seed rand
+	srand(time(NULL));
 
 	//create room structs
-	struct room utopia;
-	utopia.id = 0;
-	utopia.name = calloc(9, sizeof(char));
-	strcpy(utopia.name, "Utopia");
+	struct room rm0;
+	rm0.id = 0;
+	rm0.name = calloc(9, sizeof(char));
+	memset(rm0.name, '\0', 9);
+	rm0 = AssignRoomName(rm0, usednames);
+	printf("rm0 name: %s\n", rm0.name);
+
+	struct room rm1;
+	rm1.id = 1;
+	rm1.name = calloc(9, sizeof(char));
+	memset(rm1.name, '\0', 9);
+	rm1 = AssignRoomName(rm1, usednames);
+	printf("rm1 name: %s\n", rm1.name);
+
+	struct room rm2;
+	rm2.id = 2;
+	rm2.name = calloc(9, sizeof(char));
+	memset(rm2.name, '\0', 9);
+	rm2 = AssignRoomName(rm2, usednames);
+	printf("rm2 name: %s\n", rm2.name);
+
+	struct room rm3;
+	rm3.id = 3;
+	rm3.name = calloc(9, sizeof(char));
+	memset(rm3.name, '\0', 9);
+	rm3 = AssignRoomName(rm3, usednames);
+	printf("rm3 name: %s\n", rm3.name);
+
+	struct room rm4;
+	rm4.id = 4;
+	rm4.name = calloc(9, sizeof(char));
+	memset(rm4.name, '\0', 9);
+	rm4 = AssignRoomName(rm4, usednames);
+	printf("rm4 name: %s\n", rm4.name);
+
+	struct room rm5;
+	rm5.id = 5;
+	rm5.name = calloc(9, sizeof(char));
+	memset(rm5.name, '\0', 9);
+	rm5 = AssignRoomName(rm5, usednames);
+	printf("rm5 name: %s\n", rm5.name);
+
+	struct room rm6;
+	rm6.id = 6;
+	rm6.name = calloc(9, sizeof(char));
+	memset(rm6.name, '\0', 9);
+	rm6 = AssignRoomName(rm6, usednames);
+	printf("rm6 name: %s\n", rm6.name);
+
+
+
+	//make game graph
 	
-	printf("Struct's name and id: %s %d\n", utopia.name, utopia.id);
 
-	struct room notopia;
-	notopia.id = 1;
-	notopia.name = calloc(9, sizeof(char));
-	strcpy(notopia.name, "NoTopia");
-	
-	printf("Struct's name and id: %s %d\n", notopia.name, notopia.id);
-
-	struct room youtopia;
-	youtopia.id = 2;
-	youtopia.name = calloc(9, sizeof(char));
-	strcpy(youtopia.name, "YouTopia");
-	
-	printf("Struct's name and id: %s %d\n", youtopia.name, youtopia.id);
-
-	struct room mehtopia;
-	mehtopia.id = 3;
-	mehtopia.name = calloc(9, sizeof(char));
-	strcpy(mehtopia.name, "MehTopia");
-	
-	printf("Struct's name and id: %s %d\n", mehtopia.name, mehtopia.id);
-
-	struct room cattopia;
-	cattopia.id = 4;
-	cattopia.name = calloc(9, sizeof(char));
-	strcpy(cattopia.name, "CatTopia");
-	
-	printf("Struct's name and id: %s %d\n", cattopia.name, cattopia.id);
-
-	struct room dogtopia;
-	dogtopia.id = 5;
-	dogtopia.name = calloc(9, sizeof(char));
-	strcpy(dogtopia.name, "DogTopia");
-	
-	printf("Struct's name and id: %s %d\n", dogtopia.name, dogtopia.id);
-
-	struct room bottopia;
-	bottopia.id = 6;
-	bottopia.name = calloc(9, sizeof(char));
-	strcpy(bottopia.name, "BotTopia");
-	
-	printf("Struct's name and id: %s %d\n", bottopia.name, bottopia.id);
-
-	struct room dietopia;
-	dietopia.id = 7;
-	dietopia.name = calloc(9, sizeof(char));
-	strcpy(dietopia.name, "DieTopia");
-	
-	printf("Struct's name and id: %s %d\n", dietopia.name, dietopia.id);
-
-	struct room mootopia;
-	mootopia.id = 8;
-	mootopia.name = calloc(9, sizeof(char));
-	strcpy(mootopia.name, "MooTopia");
-	
-	printf("Struct's name and id: %s %d\n", mootopia.name, mootopia.id);
-
-	struct room vimtopia;
-	vimtopia.id = 9;
-	vimtopia.name = calloc(9, sizeof(char));
-	strcpy(vimtopia.name, "VimTopia");
-	
-	printf("Struct's name and id: %s %d\n", vimtopia.name, vimtopia.id);
-
-
-
-	//create room map
+	//make new directory and generate files
+	//MakeDirectory(dirname);
+	//MakeFile(dirname);
 
 	//free allocated mem
-	free(utopia.name);
-	free(notopia.name);
-	free(youtopia.name);
-	free(mehtopia.name);
-	free(cattopia.name);
-	free(dogtopia.name);
-	free(bottopia.name);
-	free(dietopia.name);
-	free(mootopia.name);
-	free(vimtopia.name);
-
-
+	free(rm0.name);
+	free(rm1.name);
+	free(rm2.name);
+	free(rm3.name);
+	free(rm4.name);
+	free(rm5.name);
+	free(rm6.name);
 
 	return 0;
 }
 
 /*********************************************************************************
- *Function: makeDirectory								 *
+ *Function: MakeDirectory								 *
  * Description: Takes a char pointer as an arg, and sets it to point to the new  *
  * directory name, then creates that directory.
  ********************************************************************************/
-void makeDirectory(char* name){
+void MakeDirectory(char* name){
 	int pid;
 
 	//get pid and append to directory name
@@ -150,11 +132,11 @@ void makeDirectory(char* name){
 }
 
 /********************************************************************************
- *Function: makeFile								*
+ *Function: MakeFile								*
  * Description: Takes a pointer to the directory name as an arg, then creates   *
  * files in said directory.
  *******************************************************************************/
-void makeFile(char* dname){
+void MakeFile(char* dname){
 	int file_descriptor, i=0;
 	char* rmname;
 	char file[20] ;
@@ -212,5 +194,52 @@ void makeFile(char* dname){
 			exit(1);
 		}
 	}
+}
+
+/********************************************************************************
+ *Function: AssignRoomName							*
+ * Description: *
+ *******************************************************************************/
+struct room AssignRoomName(struct room blank, int assigned[]){
+	struct room newname = blank;
+	int i = 0;
+	
+	i = rand() % 10;
+	
+	
+	switch (i)
+	{
+		case 0:
+			sprintf(newname.name, "Utopia");
+			break;
+		case 1:
+			sprintf(newname.name, "NoTopia");
+			break; 	
+		case 2:
+			sprintf(newname.name, "YouTopia");
+			break; 
+		case 3:
+			sprintf(newname.name, "MehTopia");
+			break; 	
+		case 4:
+			sprintf(newname.name, "CatTopia");
+			break;
+		case 5:
+			sprintf(newname.name, "DogTopia");
+			break; 	
+		case 6:
+			sprintf(newname.name, "BotTopia");
+			break;
+		case 7:
+			sprintf(newname.name, "DieTopia");
+			break;
+		case 8:
+			sprintf(newname.name, "MooTopia");	
+			break; 	
+		case 9:
+			sprintf(newname.name, "VimTopia");
+			break;	
+	}
+	return newname;
 }
 
