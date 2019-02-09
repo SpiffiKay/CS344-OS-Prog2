@@ -25,7 +25,7 @@ void AddRandomConnection(struct room* arr[]);
 struct room GetRandomRoom(struct room* arr[]);
 int CanAddConnectionFrom(struct room); 
 int ConnectionAlreadyExists(struct room, struct room);
-
+int IsSameRoom(struct room, struct room); 
 
 
 //room struct
@@ -256,31 +256,30 @@ void AddRandomConnection(struct room* rooms[]){
 	struct room a;  
 	struct room b;
 
-	a = GetRandomRoom(rooms);
-	printf("a: %s\n", a.name);
-//	while(true)
-//	{	
+	while(true)
+	{	
 		a = GetRandomRoom(rooms);
-		printf("a: %s\n", a.name);
-
+//		printf("a: %s\n", a.name);
+		
 		if (CanAddConnectionFrom(a) == 1)
 		{	 
 			printf("in if, true is real!\n");
 			//break;
 		}
-//	}
-
-//	do
-//	{
+	}
+	do
+	{
 		b = GetRandomRoom(rooms);
 		printf("b: %s\n", b.name);
-//	}
-//	while(CanAddConnectionFrom(B) == false || IsSameRoom(A, B) == true || ConnectionAlreadyExists(A, B) == true);
-
+	}
+	while(CanAddConnectionFrom(b) == false || IsSameRoom(a,b) == true || ConnectionAlreadyExists(a,b) == true);
+{
+	IsSameRoom(a,b);
 	ConnectionAlreadyExists(a,b);
 
-//	ConnectRoom(A, B);  // TODO: Add this connection to the real variables, 
-//	ConnectRoom(B, A);  //  because this A and B will be destroyed when this function terminates
+//	ConnectRoom(a,b);  // TODO: Add this connection to the real variables, 
+//	ConnectRoom(a,b);  //  because this A and B will be destroyed when this function terminates
+}
 
 }
 
@@ -341,11 +340,19 @@ int ConnectionAlreadyExists(struct room x, struct room y){
 }
 
 // Connects Rooms x and y together, does not check if this connection is valid
-//void ConnectRoom(Room x, Room y) 
-//{
-//}
+void ConnectRoom(struct room x, struct room y){
 
-// Returns true if Rooms x and y are the same Room, false otherwise
-//bool IsSameRoom(Room x, Room y) 
-//{
-//}
+}
+
+/********************************************************************************
+ *Function: *
+ * Description: Returns true if Rooms x and y are the same Room, false otherwise*
+ *******************************************************************************/
+int IsSameRoom(struct room x, struct room y){
+	int same = 0;
+
+	if(x.id == y.id)
+		same = 1;
+	printf("In IsSameRoom, same: %d\n", same);
+	return same;
+}
