@@ -26,7 +26,7 @@ struct room GetRandomRoom(struct room* arr[]);
 int CanAddConnectionFrom(struct room); 
 int ConnectionAlreadyExists(struct room, struct room);
 int IsSameRoom(struct room, struct room); 
-
+void ConnectRoom(struct room, struct room, struct room* arr[]);
 
 //room struct
 struct room {
@@ -55,6 +55,7 @@ int main(){
 	struct room rm0;
 	rm0.id = 0;
 	rm0.name = calloc(9, sizeof(char));
+	rm0.cnct = 0;
 	memset(rm0.name, '\0', 9);
 	rm0 = AssignRoomName(rm0, usednames);
 	myrooms[0] = &rm0;
@@ -63,6 +64,7 @@ int main(){
 	struct room rm1;
 	rm1.id = 1;
 	rm1.name = calloc(9, sizeof(char));
+	rm1.cnct = 0;
 	memset(rm1.name, '\0', 9);
 	rm1 = AssignRoomName(rm1, usednames);
 	myrooms[1] = &rm1;
@@ -71,6 +73,7 @@ int main(){
 	struct room rm2;
 	rm2.id = 2;
 	rm2.name = calloc(9, sizeof(char));
+	rm2.cnct = 0;
 	memset(rm2.name, '\0', 9);
 	rm2 = AssignRoomName(rm2, usednames);
 	myrooms[2] = &rm2;
@@ -79,6 +82,7 @@ int main(){
 	struct room rm3;
 	rm3.id = 3;
 	rm3.name = calloc(9, sizeof(char));
+	rm3.cnct = 0;
 	memset(rm3.name, '\0', 9);
 	rm3 = AssignRoomName(rm3, usednames);
 	myrooms[3] = &rm3;
@@ -87,6 +91,7 @@ int main(){
 	struct room rm4;
 	rm4.id = 4;
 	rm4.name = calloc(9, sizeof(char));
+	rm4.cnct = 0;
 	memset(rm4.name, '\0', 9);
 	rm4 = AssignRoomName(rm4, usednames);
 	myrooms[4] = &rm4;
@@ -95,6 +100,7 @@ int main(){
 	struct room rm5;
 	rm5.id = 5;
 	rm5.name = calloc(9, sizeof(char));
+	rm5.cnct = 0;
 	memset(rm5.name, '\0', 9);
 	rm5 = AssignRoomName(rm5, usednames);
 	myrooms[5] = &rm5;
@@ -103,6 +109,7 @@ int main(){
 	struct room rm6;
 	rm6.id = 6;
 	rm6.name = calloc(9, sizeof(char));
+	rm6.cnct = 0;
 	memset(rm6.name, '\0', 9);
 	rm6 = AssignRoomName(rm6, usednames);
 	myrooms[6] = &rm6;
@@ -114,11 +121,6 @@ int main(){
 	//while (IsGraphFull() == false)
 	//{
 		 AddRandomConnection(myrooms);
-	//}
-
-	// Returns true if all rooms have 3 to 6 outbound connections, false otherwise
-	//bool IsGraphFull()  
-	//{
 	//}
 
 	//make new directory and generate files
@@ -256,8 +258,8 @@ void AddRandomConnection(struct room* rooms[]){
 	struct room a;  
 	struct room b;
 
-	while(true)
-	{	
+//	while(1)
+//	{	
 		a = GetRandomRoom(rooms);
 //		printf("a: %s\n", a.name);
 		
@@ -266,21 +268,22 @@ void AddRandomConnection(struct room* rooms[]){
 			printf("in if, true is real!\n");
 			//break;
 		}
-	}
-	do
-	{
+//	}
+//	do
+//	{
 		b = GetRandomRoom(rooms);
 		printf("b: %s\n", b.name);
-	}
-	while(CanAddConnectionFrom(b) == false || IsSameRoom(a,b) == true || ConnectionAlreadyExists(a,b) == true);
-{
+//	}
+//	while(CanAddConnectionFrom(b) == 0 || IsSameRoom(a,b) == 1 || ConnectionAlreadyExists(a,b) == 1);
+//{
 	IsSameRoom(a,b);
 	ConnectionAlreadyExists(a,b);
 
-//	ConnectRoom(a,b);  // TODO: Add this connection to the real variables, 
+	ConnectRoom(a,b,rooms);  // TODO: Add this connection to the real variables, 
 //	ConnectRoom(a,b);  //  because this A and B will be destroyed when this function terminates
-}
-
+//}
+	printf("rooms[a.id].outcncts[%d] points to %s\n", a.cnct, rooms[a.id]->outcncts[a.cnct]->name);
+	//printf("a points to %s\n", a.outcncts[(a.cnct - 1)]->name);
 }
 
 /********************************************************************************
@@ -339,9 +342,17 @@ int ConnectionAlreadyExists(struct room x, struct room y){
 	return cnct;
 }
 
-// Connects Rooms x and y together, does not check if this connection is valid
-void ConnectRoom(struct room x, struct room y){
 
+/********************************************************************************
+ *Function: *
+ * Description:  Connects Rooms x and y together, does not check if this 	*
+ * connection is valid`								*
+ *******************************************************************************/
+void ConnectRoom(struct room x, struct room y, struct room* rooms[]){
+	rooms[x.id]->outcncts[x.cnct] = &y;
+	printf("rooms[x.id].outcncts[%d] points to %s\n", x.cnct, rooms[x.id]->outcncts[x.cnct]->name);
+	printf("x.cnct: %d rooms[x.id]->cnct: %d\n", x.cnct, rooms[x.id]->cnct);
+	rooms[x.id]->cnct++;
 }
 
 /********************************************************************************
@@ -350,9 +361,12 @@ void ConnectRoom(struct room x, struct room y){
  *******************************************************************************/
 int IsSameRoom(struct room x, struct room y){
 	int same = 0;
-
 	if(x.id == y.id)
 		same = 1;
-	printf("In IsSameRoom, same: %d\n", same);
 	return same;
 }
+
+// Returns true if all rooms have 3 to 6 outbound connections, false otherwise
+//bool IsGraphFull()  
+//{
+//}
