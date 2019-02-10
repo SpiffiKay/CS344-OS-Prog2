@@ -26,8 +26,10 @@ struct room GetRandomRoom(struct room* arr[]);
 int CanAddConnectionFrom(struct room); 
 int ConnectionAlreadyExists(struct room, struct room);
 int IsSameRoom(struct room, struct room); 
-void ConnectRoom(struct room, struct room, struct room* arr[]);
+void ConnectRoom(struct room, struct room);
+int IsGraphFull(struct room* arr[]);
 
+  
 //room struct
 struct room {
 	int id;
@@ -117,11 +119,12 @@ int main(){
 
 	
 	//make game graph
-	// Create all connections in graph
-	//while (IsGraphFull() == false)
-	//{
+	while (IsGraphFull(myrooms) == 0)
+	{
 		 AddRandomConnection(myrooms);
-	//}
+	}
+
+//	IsGraphFull(myrooms);
 
 	//make new directory and generate files
 	//MakeDirectory(dirname);
@@ -258,32 +261,44 @@ void AddRandomConnection(struct room* rooms[]){
 	struct room a;  
 	struct room b;
 
-//	while(1)
-//	{	
+	while(1)
+	{	
 		a = GetRandomRoom(rooms);
-//		printf("a: %s\n", a.name);
+		printf("a: %s\n", a.name);
 		
 		if (CanAddConnectionFrom(a) == 1)
 		{	 
-			printf("in if, true is real!\n");
-			//break;
+			break;
 		}
-//	}
-//	do
-//	{
+	}
+
+	do
+	{
 		b = GetRandomRoom(rooms);
 		printf("b: %s\n", b.name);
-//	}
-//	while(CanAddConnectionFrom(b) == 0 || IsSameRoom(a,b) == 1 || ConnectionAlreadyExists(a,b) == 1);
-//{
-	IsSameRoom(a,b);
-	ConnectionAlreadyExists(a,b);
+	}
+	while(CanAddConnectionFrom(b) == 0 || IsSameRoom(a,b) == 1 || ConnectionAlreadyExists(a,b) == 1);
+	{
+//	IsSameRoom(a,b);
+//	ConnectionAlreadyExists(a,b);
 
-	ConnectRoom(a,b,rooms);  // TODO: Add this connection to the real variables, 
-//	ConnectRoom(a,b);  //  because this A and B will be destroyed when this function terminates
-//}
+	//ConnectRoom(a,b);  // T Add this connection to the real variables, 
+	//ConnectRoom(b,a);  //  because this A and B will be destroyed when this function terminates
+
+	//store room connections in permanent rooms
+		rooms[a.id]->outcncts[rooms[a.id]->cnct] = &b;
+		rooms[b.id]->outcncts[rooms[b.id]->cnct] = &a;
+	}
+	
 	printf("rooms[a.id].outcncts[%d] points to %s\n", a.cnct, rooms[a.id]->outcncts[a.cnct]->name);
-	//printf("a points to %s\n", a.outcncts[(a.cnct - 1)]->name);
+	printf("rooms[b.id].outcncts[%d] points to %s\n", b.cnct, rooms[b.id]->outcncts[b.cnct]->name);
+	printf("a.id: %d b.id: %d\n", a.id, b.id);
+	
+	//increment connection counter for each room
+	rooms[a.id]->cnct++;
+	rooms[b.id]->cnct++;
+	
+	printf("#of connections: %s: %d, %s: %d\n\n", rooms[a.id]->name, rooms[a.id]->cnct, rooms[b.id]->name, rooms[b.id]->cnct);
 }
 
 /********************************************************************************
@@ -297,8 +312,7 @@ struct room GetRandomRoom(struct room* rooms[]){
 
 	//randomly assign roomname
 	r = rand() % 7;
-	random = *rooms[r];
-	printf("random: %s\n", random.name);	
+	random = *rooms[r];	
 
 	return random;
 }
@@ -314,6 +328,7 @@ int CanAddConnectionFrom(struct room x){
 	//change bool to true if connections is <6
 	if(x.cnct < 6)
 	{
+		printf("connection less than 6\n");
 		cnct = 1;
 	}
 
@@ -327,46 +342,97 @@ int CanAddConnectionFrom(struct room x){
  ********************************************************************************/
 int ConnectionAlreadyExists(struct room x, struct room y){
 	int cnct = 0, i = 0;
+	
+	printf("x.id: %d y.id %d\n", x.id, y.id);
 
-	for(i; i < y.cnct; i++)
+	for(i; i < x.cnct; i++)
 	{
+		printf("\ni: %d, x.cnct: %d\n", i, x.cnct);
+		
 		//change bool to true if connection exists
-		if(x.id == y.outcncts[i]->id)
+		if(y.id == x.outcncts[i]->id)
 		{
+			printf("y.id: %d, x.outcncts[i]->id: %d\n", y.id, x.outcncts[i]->id);
+			printf("connection already exists!\n\n");
 			cnct = 1;
-			break;
 		}
 	}
 	
-	printf("In ConnectionAlreadyExists, cnct: %d\n", cnct);
 	return cnct;
 }
 
 
 /********************************************************************************
- *Function: *
+ *Function: ConnectRoom								*
  * Description:  Connects Rooms x and y together, does not check if this 	*
  * connection is valid`								*
  *******************************************************************************/
-void ConnectRoom(struct room x, struct room y, struct room* rooms[]){
-	rooms[x.id]->outcncts[x.cnct] = &y;
-	printf("rooms[x.id].outcncts[%d] points to %s\n", x.cnct, rooms[x.id]->outcncts[x.cnct]->name);
-	printf("x.cnct: %d rooms[x.id]->cnct: %d\n", x.cnct, rooms[x.id]->cnct);
-	rooms[x.id]->cnct++;
-}
+//void ConnectRoom(struct room x, struct room y){
+	//set room x pointer to room y
+//	x.outcncts[x.cnct] = &y;
 
+//	printf("x.outcncts[%d] points to %s\n", x.cnct, x.outcncts[x.cnct]->name);
+	//increment connection count
+//	x.cnct++;
+//}
 /********************************************************************************
- *Function: *
+ *Function: IsSameRoom								*
  * Description: Returns true if Rooms x and y are the same Room, false otherwise*
  *******************************************************************************/
 int IsSameRoom(struct room x, struct room y){
 	int same = 0;
 	if(x.id == y.id)
 		same = 1;
+	printf("in IsSameRoom, same: %d\n", same);
 	return same;
 }
 
-// Returns true if all rooms have 3 to 6 outbound connections, false otherwise
-//bool IsGraphFull()  
-//{
-//}
+/********************************************************************************
+ *Function: IsGraphFull								*
+ * Description: Returns true if all rooms have 3 to 6 outbound connections, 	*
+ * false otherwise
+ *******************************************************************************/
+int IsGraphFull(struct room* rooms[]){
+	int full = 0, i = 0;
+	int c0 = 0, c1 = 0, c2 = 0, c3 = 0, c4 = 0, c5 = 0, c6 = 0;
+
+	//check connect count for each room
+	for(i; i<7; i++)
+	{
+		//if a room has 3 or more connects, its bool changes to true
+		if(rooms[i]->cnct >= 3)
+		{
+			switch (i)
+			{
+				case 0:
+					c0 = 1;
+					break;
+				case 1:
+					c1 = 1;
+					break; 	
+				case 2:
+					c2 = 1;
+					break; 
+				case 3:
+					c3 = 1;
+					break; 	
+				case 4:
+					c4 = 1;
+					break;
+				case 5:
+					c5 = 1;
+					break; 	
+				case 6:
+					c6 = 1;
+					break;
+			}
+		}
+	}
+	
+	//if all rooms have 3 or more connections, change bool to true	
+	if (c0 == 1 && c1 == 1 && c2 == 1 && c3 == 1 && c4 == 1 && c5 == 1 && c6 == 1)
+		full = 1;
+	
+	printf("in IsGraphFull. full: %d\n", full);
+	return full;
+}
