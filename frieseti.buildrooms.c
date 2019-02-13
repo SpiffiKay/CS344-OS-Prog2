@@ -2,12 +2,6 @@
  * Title: frieseti.buildrooms.c                                                 *
  * Name: Tiffani Auer								*
  * Due: Feb 14, 2019								*
- * Description: *
- *******************************************************************************/
-
-/********************************************************************************
- *Function: *
- * Description: *
  *******************************************************************************/
 
 
@@ -18,18 +12,6 @@
 #include <fcntl.h>
 #include <time.h>
 
-void MakeDirectory(char*);
-void MakeFile(char*);
-struct room AssignRoomName(struct room, int arr[]);
-void AddRandomConnection(struct room* arr);
-struct room GetRandomRoom(struct room* arr);
-int CanAddConnectionFrom(int); 
-int ConnectionAlreadyExists(int, struct room);
-int IsSameRoom(int, int); 
-void ConnectRoom(struct room, struct room);
-int IsGraphFull(struct room* arr);
-void SetRoomsOrder(struct room* arr);
-  
 //room struct
 struct room {
 	int id;
@@ -39,6 +21,17 @@ struct room {
 	struct room* outcncts;
 };
 
+void MakeDirectory(char*);
+void MakeRoomFile(struct room*, char*);
+struct room AssignRoomName(struct room, int arr[]);
+void AddRandomConnection(struct room*);
+struct room GetRandomRoom(struct room*);
+int CanAddConnectionFrom(int); 
+int ConnectionAlreadyExists(int, struct room);
+int IsSameRoom(int, int); 
+int IsGraphFull(struct room*);
+void SetRoomsOrder(struct room*);
+  
 /********************************************************************************
 *Function: main									*
 * Description: Initializes all structs, as well as pointers to the structs. It 	*
@@ -57,14 +50,13 @@ int main(){
 	struct room* myrooms;
 	myrooms = (struct room*) malloc(7 * sizeof(struct room));	
 
-
 	//create room structs
 	struct room rm0;
 	rm0.id = 0;
 	rm0.name = calloc(9, sizeof(char));
 	memset(rm0.name, '\0', 9);
-	rm0.rtype = calloc(4, sizeof(char));
-	memset(rm0.rtype, '\0', 4);
+	rm0.rtype = calloc(11, sizeof(char));
+	memset(rm0.rtype, '\0', 11);
 	rm0.cnct = 0;
 	rm0.outcncts = (struct room*) malloc(6 * sizeof(struct room));
 	memset(rm0.outcncts, '\0', 6);
@@ -75,8 +67,8 @@ int main(){
 	rm1.id = 1;
 	rm1.name = calloc(9, sizeof(char));
 	memset(rm1.name, '\0', 9);
-	rm1.rtype = calloc(4, sizeof(char));
-	memset(rm1.rtype, '\0', 4);
+	rm1.rtype = calloc(11, sizeof(char));
+	memset(rm1.rtype, '\0', 11);
 	rm1.cnct = 0;
 	rm1.outcncts = (struct room*) malloc(6 * sizeof(struct room));
 	memset(rm1.outcncts, '\0', 6);
@@ -87,8 +79,8 @@ int main(){
 	rm2.id = 2;
 	rm2.name = calloc(9, sizeof(char));
 	memset(rm2.name, '\0', 9);
-	rm2.rtype = calloc(4, sizeof(char));
-	memset(rm2.rtype, '\0', 4);
+	rm2.rtype = calloc(11, sizeof(char));
+	memset(rm2.rtype, '\0', 11);
 	rm2.cnct = 0;
 	rm2.outcncts = (struct room*) malloc(6 * sizeof(struct room));
 	memset(rm2.outcncts, '\0', 6);
@@ -99,8 +91,8 @@ int main(){
 	rm3.id = 3;
 	rm3.name = calloc(9, sizeof(char));
 	memset(rm3.name, '\0', 9);
-	rm3.rtype = calloc(4, sizeof(char));
-	memset(rm3.rtype, '\0', 4);
+	rm3.rtype = calloc(11, sizeof(char));
+	memset(rm3.rtype, '\0', 11);
 	rm3.cnct = 0;
 	rm3.outcncts = (struct room*) malloc(6 * sizeof(struct room));
 	memset(rm3.outcncts, '\0', 6);
@@ -111,8 +103,8 @@ int main(){
 	rm4.id = 4;
 	rm4.name = calloc(9, sizeof(char));
 	memset(rm4.name, '\0', 9);
-	rm4.rtype = calloc(4, sizeof(char));
-	memset(rm4.rtype, '\0', 4);
+	rm4.rtype = calloc(11, sizeof(char));
+	memset(rm4.rtype, '\0', 11);
 	rm4.cnct = 0;
 	rm4.outcncts = (struct room*) malloc(6 * sizeof(struct room));
 	memset(rm4.outcncts, '\0', 6);
@@ -123,8 +115,8 @@ int main(){
 	rm5.id = 5;
 	rm5.name = calloc(9, sizeof(char));
 	memset(rm5.name, '\0', 9);
-	rm5.rtype = calloc(4, sizeof(char));
-	memset(rm5.rtype, '\0', 4);
+	rm5.rtype = calloc(11, sizeof(char));
+	memset(rm5.rtype, '\0', 11);
 	rm5.cnct = 0;
 	rm5.outcncts = (struct room*) malloc(6 * sizeof(struct room));
 	memset(rm5.outcncts, '\0', 6);
@@ -135,8 +127,8 @@ int main(){
 	rm6.id = 6;
 	rm6.name = calloc(9, sizeof(char));
 	memset(rm6.name, '\0', 9);
-	rm6.rtype = calloc(4, sizeof(char));
-	memset(rm6.rtype, '\0', 4);
+	rm6.rtype = calloc(11, sizeof(char));
+	memset(rm6.rtype, '\0', 11);
 	rm6.cnct = 0;
 	rm6.outcncts = (struct room*) malloc(6 * sizeof(struct room));
 	memset(rm6.outcncts, '\0', 6);
@@ -152,7 +144,7 @@ int main(){
 	
 	//make new directory and generate files
 	MakeDirectory(dirname);
-	//MakeFile(dirname);
+	MakeRoomFile(myrooms, dirname);
 
 	//free allocated mem
 	free(rm0.name);
@@ -200,29 +192,39 @@ void MakeDirectory(char* name){
 
 /********************************************************************************
 *Function: MakeFile								*
-* Description: Takes a pointer to the directory name as an arg, then creates    *
-* files in said directory.							*
+* Description: Takes a pointer to the directory name as an arg, creates files in*
+* said directory, then populates them with the room information.		*
 ********************************************************************************/
-void MakeFile(char* dname){
-	int file_descriptor, i=0;
-	char* rmname;
-	char file[20] ;
-	memset(file, '\0', 20);
-		
+void MakeRoomFile(struct room* rooms, char* dname){
+	int i = 0, j = 0;
+	FILE *fname = NULL;
+	char file[50];
+	memset(file, '\0', 50);
+
 	//create room files
-	for(i; i < 10; i++)
+	for(i; i < 7; i++)
 	{
 		//create file path
-		sprintf(file, "%s/%s", dname, rmname);	
+		sprintf(file, "%s/room_%s", dname, rooms[i].name);	
 
-		//create files
-		file_descriptor = open(file, O_WRONLY | O_CREAT, 0600);
-		if(file_descriptor < 0)
+		//create file and check if opened
+		fname = fopen(file, "w");
+		if(fname == NULL)
 		{
-			//fprintf(stderr, "Could not open %s\n", file);
-			printf("Could not open %s\n", file);
+			fprintf(stderr, "Could not open %s\n", file);
 			exit(1);
 		}
+		//write to file
+		fprintf(fname, "ROOM NAME: %s\n", rooms[i].name);	
+		for(j; j < rooms[i].cnct; j++)
+		{
+			fprintf(fname, "CONNECTION %d: %s\n",(j+1),rooms[i].outcncts[j].name);
+		}
+		fprintf(fname, "ROOM TYPE: %s\n", rooms[i].rtype);
+		j = 0;
+		
+		//close file
+		fclose(fname);
 	}
 }
 
@@ -444,8 +446,8 @@ void SetRoomsOrder(struct room* rooms){
 	int i = 0;
 	
 	for(i; i < 7; i++)
-		sprintf(rooms[i].rtype, "mid");
+		sprintf(rooms[i].rtype, "MID_ROOM");
 
-	sprintf(rooms[0].rtype, "beg");
-	sprintf(rooms[1].rtype, "end");
+	sprintf(rooms[0].rtype, "START_ROOM");
+	sprintf(rooms[1].rtype, "END_ROOM");
 }
