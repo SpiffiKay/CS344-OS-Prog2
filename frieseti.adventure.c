@@ -145,6 +145,14 @@ void GetFiles(char* subdir, struct room* rooms){
 	DIR* currdir;
 	DIR* mydir;
 	FILE* fname = NULL;
+	char line[50];
+	memset(line, '\0', 50);
+	char info[11];
+	memset(info, '\0', 11);
+	char extra[11];
+	memset(extra, '\0',11);
+	char extra2[11];
+	memset(extra2, '\0',11);
 	int i = 0, j = 0;
  	char *trgtPrfx = "room_";
 	char newfile[30]; 
@@ -181,7 +189,13 @@ void GetFiles(char* subdir, struct room* rooms){
 						exit(1);
 					}
 					
-					//read from 						
+					//read lines from file
+					while(fgets(line, 50, fname)!=NULL)
+					{
+						printf("%s\n", line);
+						sscanf(line,"%s %s %s", extra, extra2, info);
+						printf("parsed: %s\n", info);
+					}
       				}		
     			}	
 
