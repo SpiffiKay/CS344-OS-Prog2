@@ -22,10 +22,10 @@ struct room{
 	struct room* outcncts;
 };
 
-void GetRooms(struct room*, char*); 
+void GetRooms(char*); 
 void GetRecentDir(char*);
-void GetFiles(char*, struct room*);
-
+void GetFiles(char*);
+void PlayGame();
 
 
 /********************************************************************************
@@ -33,67 +33,26 @@ void GetFiles(char*, struct room*);
 * Description: 									*
 ********************************************************************************/
 int main(){
-	struct room* myrooms = (struct room*) malloc(7 * sizeof(struct room));
+	//struct room* myrooms = (struct room*) malloc(7 * sizeof(struct room));
 	char* dirname = calloc(25, sizeof(char));
-	memset(dirname, '\0', 25);
-	//get rooms from files into array
-	GetRooms(myrooms, dirname);
-
-		
-
-	//free allocated memory
-	free(myrooms);
+	memset(dirname, '\0', 25);	//get rooms from files into array
+	GetRooms(dirname);
+	
+	//free allocated mem
+	//free(myrooms);
 	free(dirname);
+
 	return 0;
 }
-/********************************************************************************
-*Function: MakeFile								*
-* Description: Takes a pointer to the directory name as an arg, creates files in*
-* said directory, then populates them with the room information.		*
-********************************************************************************/
-void MakeRoomFile(struct room* rooms, char* dname){
-	int i = 0, j = 0;
-	FILE *fname = NULL;
-	char file[50];
-	memset(file, '\0', 50);
-
-	//create room files
-	for(i; i < 7; i++)
-	{
-		//create file path
-		sprintf(file, "%s/room_%s", dname, rooms[i].name);	
-
-		//create file and check if opened
-		fname = fopen(file, "w");
-		if(fname == NULL)
-		{
-			fprintf(stderr, "Could not open %s\n", file);
-			exit(1);
-		}
-		//write to file
-		fprintf(fname, "ROOM NAME: %s\n", rooms[i].name);	
-		for(j; j < rooms[i].cnct; j++)
-		{
-			fprintf(fname, "CONNECTION %d: %s\n",(j+1),rooms[i].outcncts[j].name);
-		}
-		fprintf(fname, "ROOM TYPE: %s\n", rooms[i].rtype);
-		j = 0;
-		
-		//close file
-		fclose(fname);
-	}
-}
-
 
 /********************************************************************************
 *Function: GetRooms 								*
 * Description: 									*
 ********************************************************************************/
-void GetRooms(struct room* rooms, char* subdir){
+void GetRooms(char* subdir){
 	//find most recent game directory
 	GetRecentDir(subdir);
-	printf("\nIN GetRooms subdir: %s\n\n", subdir);
-	GetFiles(subdir, rooms);
+	GetFiles(subdir);
 }
 
 /********************************************************************************
@@ -141,7 +100,7 @@ void GetRecentDir(char* subdir){
 *Function: GetFiles 								*
 * Description: 									*
 ********************************************************************************/
-void GetFiles(char* subdir, struct room* rooms){
+void GetFiles(char* subdir){
 	DIR* currdir;
 	DIR* mydir;
 	FILE* fname = NULL;
@@ -158,8 +117,6 @@ void GetFiles(char* subdir, struct room* rooms){
 	char newfile[30]; 
 	memset(newfile, '\0', 30);
  	struct dirent *fileInDir; // current subdir
- 
-
 
 
 	//open and check if current directory is open
@@ -171,12 +128,13 @@ void GetFiles(char* subdir, struct room* rooms){
 		if (mydir > 0)
 		{
 			printf("opened the subdir!\n");
+			PlayGame(subdir);
 			//while there are files and directories to check
 			while ((fileInDir = readdir(mydir)) != NULL) 
-    			{	
+  			{	
 				//checks all subdirs with prefix for tiemstamp 
-      				if (strstr(fileInDir->d_name, trgtPrfx) != NULL)
-    				{
+     				if (strstr(fileInDir->d_name, trgtPrfx) != NULL)
+ 				{
         				//file name
 					sprintf(newfile, "%s/%s", subdir, fileInDir->d_name);
 					printf("file found: %s\n", newfile);
@@ -189,13 +147,30 @@ void GetFiles(char* subdir, struct room* rooms){
 						exit(1);
 					}
 					
+					
 					//read lines from file
 					while(fgets(line, 50, fname)!=NULL)
 					{
-						printf("%s\n", line);
 						sscanf(line,"%s %s %s", extra, extra2, info);
-						printf("parsed: %s\n", info);
+						//printf("parsed: %s\n", info);
+						
+						if(strcmp(extra, "ROOM")==0 && strcmp(extra2, "NAME:")==0)
+						{
+						
+						}
+						else if(strcmp(extra, "CONNECTION")==0)
+						{
+							
+						}
+						else
+						{
+						
+						}
+						j = 0;
 					}
+					
+					i++;
+					
       				}		
     			}	
 
@@ -207,3 +182,5 @@ void GetFiles(char* subdir, struct room* rooms){
 	closedir(currdir);
 	
 }
+
+
