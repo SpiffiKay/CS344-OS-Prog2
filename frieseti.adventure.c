@@ -12,6 +12,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <dirent.h>
+#include <pthread.h>
+#include <time.h>
 
 //room struct
 struct room{
@@ -23,6 +25,11 @@ struct room{
 	char (*cnctnames)[9];
 };
 
+
+
+
+
+
 void GetRooms(char*, struct room*); 
 void GetRecentDir(char*, struct room*);
 void GetFiles(char*, struct room*);
@@ -32,6 +39,7 @@ int ParseInput(char*, struct room*, int);
 int IsEndRoom(struct room);
 int GetStartRoom(struct room*);
 void EndOfGame(int, char*);
+void TimeFunct();
 
 /********************************************************************************
 *Function: main									*									*
@@ -40,6 +48,13 @@ int main(){
 	struct room* myrooms = (struct room*) malloc(7 * sizeof(struct room));
 	char* dirname = calloc(25, sizeof(char));
 	memset(dirname, '\0', 25);	//get rooms from files into array
+	//create mutex
+	
+	//lock mutex	
+
+	//create thread
+	//int pthread_create( pthread_t* tthread, NULL, void TimeFunct, NULL);
+				
 	
 	//create room structs
 	struct room rm0;
@@ -172,6 +187,18 @@ int main(){
 	free(dirname);
 
 	return 0;
+}
+
+void TimeFunct(){
+	char mytime[100];
+	time_t t;
+	struct tm *tme;
+
+	t = time(NULL);
+	tme = localtime(&t);
+	memset(mytime, '\0', 100);
+	strftime(mytime, sizeof(mytime),"%l:%M%P, %A, %B %d, %C%y", tme);
+	printf("\n%s\n",mytime);
 }
 
 /********************************************************************************
@@ -437,7 +464,7 @@ int ParseInput(char* input, struct room* rooms, int id){
 		//user wants to check time
 		else if(strcmp(info, "time")==0)
 		{
-			
+			TimeFunct();
 			printf("\nWHERE TO? >");
 			valid = 1;
 			getline(&buffer, &bfsize, stdin);
