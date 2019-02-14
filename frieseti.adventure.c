@@ -34,8 +34,7 @@ int GetStartRoom(struct room*);
 void EndOfGame(int, char*);
 
 /********************************************************************************
-*Function: main									*
-* Description: 									*
+*Function: main									*									*
 ********************************************************************************/
 int main(){
 	struct room* myrooms = (struct room*) malloc(7 * sizeof(struct room));
@@ -177,7 +176,9 @@ int main(){
 
 /********************************************************************************
 *Function: GetRooms 								*
-* Description: 									*
+* Description: Takes the char pointer for the subdirectory and struct room array*
+* as args and calls the functions needed to access the directories and files to *
+* play the game.								*
 ********************************************************************************/
 void GetRooms(char* subdir, struct room* rooms){
 	//find most recent game directory
@@ -187,7 +188,10 @@ void GetRooms(char* subdir, struct room* rooms){
 
 /********************************************************************************
 *Function: GetRecentDir 							*
-* Description: 	Modded from 2.4 Manipulating Directories								*
+* Description: 	Modded from 2.4 Manipulating Directories. This takes the name	*
+* of the subdirectory and array of room structs as args and searches for the 	*
+* most recent sub directory made for the game. It then saves the newest 	*
+* subdirectory name in the char* subdir passed to the function.			* 
 ********************************************************************************/
 void GetRecentDir(char* subdir, struct room* rooms){
 	int newTime = -1; // newest subdir examined timestamp
@@ -228,7 +232,10 @@ void GetRecentDir(char* subdir, struct room* rooms){
 
 /********************************************************************************
 *Function: GetFiles 								*
-* Description: 									*
+* Description: Takes the name of the subdirectory and an array of room structs  *	
+* as an arg. It then opens the path to the directory, and opens all the files in*
+* the directory. Each file is then parsed and used to reconstruct the room 	*
+* structs.									*
 ********************************************************************************/
 void GetFiles(char* subdir, struct room* rooms){
 	DIR* currdir;	//current dir
@@ -264,7 +271,6 @@ void GetFiles(char* subdir, struct room* rooms){
  				{
         				//file name
 					sprintf(newfile, "%s/%s", subdir, fileInDir->d_name);
-					//printf("file found: %s\n", newfile);
 		
 					//open file and check that it opened
 					fname = fopen(newfile, "r");
@@ -283,25 +289,21 @@ void GetFiles(char* subdir, struct room* rooms){
 						if(strcmp(extra, "ROOM")==0 && strcmp(extra2, "NAME:")==0)
 						{
 							sprintf(rooms[i].name, info);
-							//printf("rooms[%d].name: %s\n",i,rooms[i].name);
 						}
 						//connections
 						else if(strcmp(extra, "CONNECTION")==0)
 						{
 							sprintf(rooms[i].cnctnames[j], info);
-							//printf("rooms[%d].cnctnames[%d]: %s\n", i, j, info);
 							j++;
 						}
 						//room types
 						else
 						{
 							sprintf(rooms[i].rtype, info);
-							//printf("rooms[%d].rtype: %s\n",i,info);
 						}
 					}
 					//number of connections
 					rooms[i].cnct = j;
-					//printf("rooms[%d].cncts: %d\n\n",i,rooms[i].cnct);
 					j = 0;
 					i++;
 					fclose(fname);
@@ -316,7 +318,8 @@ void GetFiles(char* subdir, struct room* rooms){
 
 /********************************************************************************
 *Function: PlayGame 								*
-* Description: 									*
+* Description: 	Takes array of room structs as an arg, and organizes the game   *
+* play until the end room is found. 						*
 ********************************************************************************/
 void PlayGame(struct room* rooms){
 	int i = 0, j = 0, id = 0, end = 0;
@@ -346,7 +349,6 @@ void PlayGame(struct room* rooms){
 		//keep path
 		sprintf(rmname, "%s\n",rooms[id].name);
 		strcat(path, rmname);
-		
 
 		i++; //step count
 	}while(end == 0);
@@ -360,7 +362,8 @@ void PlayGame(struct room* rooms){
 
 /********************************************************************************
 *Function: GetStartRoom 							*
-* Description: 									*
+* Description: Takes an array of structs as an arg and loops through searching	*
+* for the start room. When found, returns the room ID.				*
 ********************************************************************************/
 int GetStartRoom(struct room* rooms){
 	int i = 0;
@@ -374,12 +377,15 @@ int GetStartRoom(struct room* rooms){
 
 /********************************************************************************
 *Function: PrintToScreen 							*
-* Description: 									*
+* Description: Takes current room struct as an arg and prints the current room  *
+* information to screen.							*
 ********************************************************************************/
 void PrintToScreen(struct room current){
 	int i = 0;
+	
 	//start prompts
 	printf("CURRENT LOCATION: %s\nPOSSIBLE CONNECTIONS:", current.name);
+	
 	//loop through connections
 	for(i; i < current.cnct; i++)
 	{
@@ -394,7 +400,11 @@ void PrintToScreen(struct room current){
 
 /********************************************************************************
 *Function: ParseInput								*
-* Description: 									*
+* Description: Takes the user input, array of room structs, and the id to the   *
+* currect room as args. It then determines which room user indicated and returns*
+* the ID of the room selected. If the user wrote "time" it initializes the 	*
+* process to switch mutexes to check the time. If the input is invalid, it tells*
+* the user the current room info, asks again for input, and restarts the process*
 ********************************************************************************/
 int ParseInput(char* input, struct room* rooms, int id){
 	int valid = 0;
@@ -404,10 +414,12 @@ int ParseInput(char* input, struct room* rooms, int id){
 	char* buffer = (char *)malloc(bfsize * sizeof(char)); //input buffer
 	memset(buffer, '\0', bfsize);
 		
-	
+	//loops if input is invalid	
 	do{
+		//cuts off extra characters in buffer for comparison
 		sscanf(input,"%s", info);
-	
+
+		//determine which room user indicated
 		if(strcmp(rooms[0].name, info)==0)
 			return 0;
 		else if(strcmp(rooms[1].name, info)==0)
@@ -422,6 +434,7 @@ int ParseInput(char* input, struct room* rooms, int id){
 			return 5;
 		else if(strcmp(rooms[6].name, info)==0)
 			return 6;
+		//user wants to check time
 		else if(strcmp(info, "time")==0)
 		{
 			
@@ -430,6 +443,7 @@ int ParseInput(char* input, struct room* rooms, int id){
 			getline(&buffer, &bfsize, stdin);
 			input = buffer;
 		}
+		//invalid input
 		else
 		{
 			printf("\nHUH? I DON'T UNDERSTAND THAT ROOM. TRY AGAIN.\n\n");
@@ -445,7 +459,8 @@ int ParseInput(char* input, struct room* rooms, int id){
 
 /********************************************************************************
 *Function: IsEndRoom								*
-* Description: 									*
+* Description: Takes current room struct and tests to see if it is the end room *
+* If it is it returns true, if not returns false.				*
 ********************************************************************************/
 int IsEndRoom(struct room current){
 	if(strcmp(current.rtype, "END_ROOM")==0)
@@ -453,9 +468,13 @@ int IsEndRoom(struct room current){
 	return 0;
 }
 
-
+/********************************************************************************
+*Function: EndOfGame								*
+* Description: 	Takes the number of steps taken and a list of rooms visited as  *
+* args and prints them to screen, along with ending prompts.			*
+********************************************************************************/
 void EndOfGame(int steps, char* path){
-	printf("YOU HAVE FOUND THE END ROOM. CONGRATULATIONS!\n");
+	printf("\nYOU HAVE FOUND THE END ROOM. CONGRATULATIONS!\n");
 	printf("YOU TOOK %d STEPS. YOUR PATH TO VICTORY WAS:\n%s", steps, path);
 
 }
