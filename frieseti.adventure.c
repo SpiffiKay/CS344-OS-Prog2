@@ -14,6 +14,10 @@
 #include <dirent.h>
 #include <pthread.h>
 #include <time.h>
+	
+//create mutex and thread
+pthread_mutex_t tmutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_t tthread;
 
 //room struct
 struct room{
@@ -25,11 +29,6 @@ struct room{
 	char (*cnctnames)[9];
 };
 
-
-
-
-
-
 void GetRooms(char*, struct room*); 
 void GetRecentDir(char*, struct room*);
 void GetFiles(char*, struct room*);
@@ -39,21 +38,48 @@ int ParseInput(char*, struct room*, int);
 int IsEndRoom(struct room);
 int GetStartRoom(struct room*);
 void EndOfGame(int, char*);
-void TimeFunct();
+
+
 
 /********************************************************************************
-*Function: main									*									*
+*Function: TimeFunct (thread function) 						*
+* Description: Code mostly adapted from https://linux.die.net/man/3/strftime to *
+* code time. When called the mutex is locked ensuring time is the only thread 	*
+* currently using resources. Once it has finished, it unlocks the mutex		*	
+********************************************************************************/
+void* TimeFunct(){
+	char mytime[100];
+	time_t t;
+	struct tm *tme;
+	
+	//lock mutex
+	pthread_mutex_lock(&tmutex);
+	
+	t = time(NULL);
+	tme = localtime(&t);
+	memset(mytime, '\0', 100);
+	strftime(mytime, sizeof(mytime),"%l:%M%P, %A, %B %d, %C%y", tme);
+	printf("\n%s\n",mytime);
+	
+	//unlock mutex
+	pthread_mutex_unlock(&tmutex);
+}
+
+
+/********************************************************************************
+*Function: main									*
 ********************************************************************************/
 int main(){
 	struct room* myrooms = (struct room*) malloc(7 * sizeof(struct room));
 	char* dirname = calloc(25, sizeof(char));
 	memset(dirname, '\0', 25);	//get rooms from files into array
 	//create mutex
-	
+//	pthread_mutex_t tmutex = PTHREAD_MUTEX_INITIALIZER;
 	//lock mutex	
-
+	pthread_mutex_lock(&tmutex);
 	//create thread
-	//int pthread_create( pthread_t* tthread, NULL, void TimeFunct, NULL);
+//	pthread_t tthread;
+	pthread_create(&tthread, NULL, TimeFunct, NULL);
 				
 	
 	//create room structs
@@ -185,21 +211,11 @@ int main(){
 	free(rm6.cnctnames);
 	free(myrooms);
 	free(dirname);
+	pthread_mutex_destroy(&tmutex);
 
 	return 0;
 }
 
-void TimeFunct(){
-	char mytime[100];
-	time_t t;
-	struct tm *tme;
-
-	t = time(NULL);
-	tme = localtime(&t);
-	memset(mytime, '\0', 100);
-	strftime(mytime, sizeof(mytime),"%l:%M%P, %A, %B %d, %C%y", tme);
-	printf("\n%s\n",mytime);
-}
 
 /********************************************************************************
 *Function: GetRooms 								*
@@ -464,7 +480,17 @@ int ParseInput(char* input, struct room* rooms, int id){
 		//user wants to check time
 		else if(strcmp(info, "time")==0)
 		{
-			TimeFunct();
+
+			//unlock mutex so time can use resources
+			pthread_mutex_unlock(&tmutex);
+			//join time thread
+			pthread_join(tthread, NULL);
+			//lock mutex so only adventure can use resources
+			pthread_mutex_lock(&tmutex);
+			//create new time thread
+			pthread_create(&tthread, NULL, TimeFunct, NULL);
+		
+			//back to program after time finishes	
 			printf("\nWHERE TO? >");
 			valid = 1;
 			getline(&buffer, &bfsize, stdin);
