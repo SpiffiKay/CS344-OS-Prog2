@@ -28,9 +28,10 @@ void GetRecentDir(char*, struct room*);
 void GetFiles(char*, struct room*);
 void PlayGame(struct room*);
 void PrintToScreen(struct room);
-int ParseInput(char*, struct room*, int, int);
+int ParseInput(char*, struct room*, int);
 int IsEndRoom(struct room);
 int GetStartRoom(struct room*);
+void EndOfGame(int, char*);
 
 /********************************************************************************
 *Function: main									*
@@ -319,13 +320,11 @@ void GetFiles(char* subdir, struct room* rooms){
 ********************************************************************************/
 void PlayGame(struct room* rooms){
 	int i = 0, j = 0, id = 0, end = 0;
- //	int *ptr = &i;
 	char rmname[9]; //current room
 	memset(rmname,'\0',9);
-	char (*path)[9] = malloc(30 * 9 * sizeof(char));
-	memset(path, '\0', sizeof(char[0][0]) * 30 * 9);
+	char path[200]; //keeping path
+	memset(path, '\0', 200);
 	size_t bfsize = 50;
-	size_t csize;
 	char* buffer = (char *)malloc(bfsize * sizeof(char)); //input buffer
 	memset(buffer, '\0', bfsize);
 	
@@ -334,21 +333,28 @@ void PlayGame(struct room* rooms){
 		//begin game with start room
 		if(i == 0)	
 			id = GetStartRoom(rooms);
-				
+
+		
 		//interact with user	
 		PrintToScreen(rooms[id]);
-		csize = getline(&buffer, &bfsize, stdin);
-		id = ParseInput(buffer, rooms, id, i);
+		getline(&buffer, &bfsize, stdin);
+		id = ParseInput(buffer, rooms, id);
 
 		//test if chosen room is end room
 		end = IsEndRoom(rooms[id]);
 		
+		//keep path
+		sprintf(rmname, "%s\n",rooms[id].name);
+		strcat(path, rmname);
+		
+
+		i++; //step count
 	}while(end == 0);
 
-
+	//end of game prompt
+	EndOfGame(i,path);
 
 	//free alloc mem
-	free(path);
 	free(buffer);
 }
 
@@ -390,71 +396,50 @@ void PrintToScreen(struct room current){
 *Function: ParseInput								*
 * Description: 									*
 ********************************************************************************/
-int ParseInput(char* input, struct room* rooms,int id, int step){
+int ParseInput(char* input, struct room* rooms, int id){
+	int valid = 0;
 	char info[11];		//info wanted from line
 	memset(info, '\0', 11);
+	size_t bfsize = 50;
+	char* buffer = (char *)malloc(bfsize * sizeof(char)); //input buffer
+	memset(buffer, '\0', bfsize);
 		
-	sscanf(input,"%s", info);
-		
+	
+	do{
+		sscanf(input,"%s", info);
+	
 		if(strcmp(rooms[0].name, info)==0)
-		{
-			//sprintf(path[step], input);
-			//printf("step:%s\n", path[step]);
-			step++;
 			return 0;
-		}
 		else if(strcmp(rooms[1].name, info)==0)
-		{
-			//sprintf(path[step], info);
-			//printf("step:%s\n", path[step]);
-			step++;
 			return 1;
-		}
 		else if(strcmp(rooms[2].name, info)==0)
-		{	
-			//sprintf(path[step], info);
-			//printf("step:%s\n", path[step]);
-			step++;
 			return 2;
-		}
 		else if(strcmp(rooms[3].name, info)==0)
-		{	
-			//sprintf(path[step], info);
-			//printf("step:%s\n", path[step]);
-			step++;
 			return 3;
-		}
 		else if(strcmp(rooms[4].name, info)==0)
-		{
-			//sprintf(path[step], info);
-			//printf("step:%s\n", path[step]);
-			step++;
 			return 4;
-		}
 		else if(strcmp(rooms[5].name, info)==0)
-		{
-			//sprintf(path[step], info);
-			//printf("step:%s\n", path[step]);	
-			step++;
 			return 5;
-		}
 		else if(strcmp(rooms[6].name, info)==0)
-		{
-			//sprintf(path[step], info);
-			//printf("step:%s\n", path[step]);
-			step++;
 			return 6;
-		}
 		else if(strcmp(info, "time")==0)
 		{
+			
+			printf("\nWHERE TO? >");
+			valid = 1;
+			getline(&buffer, &bfsize, stdin);
+			input = buffer;
 		}
 		else
 		{
 			printf("\nHUH? I DON'T UNDERSTAND THAT ROOM. TRY AGAIN.\n\n");
-			return id;
+			valid = 1;
+			PrintToScreen(rooms[id]);
+			getline(&buffer, &bfsize, stdin);
+			input = buffer;
 		}
-
-
+	}
+	while(valid == 1);
 }
 
 
@@ -466,4 +451,11 @@ int IsEndRoom(struct room current){
 	if(strcmp(current.rtype, "END_ROOM")==0)
 		return 1;
 	return 0;
+}
 
+
+void EndOfGame(int steps, char* path){
+	printf("YOU HAVE FOUND THE END ROOM. CONGRATULATIONS!\n");
+	printf("YOU TOOK %d STEPS. YOUR PATH TO VICTORY WAS:\n%s", steps, path);
+
+}
