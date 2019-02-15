@@ -39,28 +39,40 @@ int IsEndRoom(struct room);
 int GetStartRoom(struct room*);
 void EndOfGame(int, char*);
 
-
-
 /********************************************************************************
 *Function: TimeFunct (thread function) 						*
 * Description: Code mostly adapted from https://linux.die.net/man/3/strftime to *
 * code time. When called the mutex is locked ensuring time is the only thread 	*
-* currently using resources. Once it has finished, it unlocks the mutex		*	
+* currently using resources. It then creates the a file and writes the current  *
+* time to the file. It then unlocks the mutex then returns.	
 ********************************************************************************/
-void* TimeFunct(){
-	char mytime[100];
-	time_t t;
-	struct tm *tme;
-	
+void* TimeFunct(){	
 	//lock mutex
 	pthread_mutex_lock(&tmutex);
+	//time	
+	char mytime[50];
+	memset(mytime,'\0',50);
+	time_t t;
+	struct tm *tme;
+	//make file
+	FILE *fname = NULL;
+	char* file = "currentTime.txt";
 	
+	//find time
 	t = time(NULL);
 	tme = localtime(&t);
-	memset(mytime, '\0', 100);
 	strftime(mytime, sizeof(mytime),"%l:%M%P, %A, %B %d, %C%y", tme);
-	printf("\n%s\n",mytime);
+
+	fname = fopen(file, "w");
+	if(fname == NULL)
+	{
+		fprintf(stderr, "Could not open %s\n",file);
+	}
+
+	fputs(mytime, fname);
 	
+	//close file
+	fclose(fname); 
 	//unlock mutex
 	pthread_mutex_unlock(&tmutex);
 }
@@ -73,15 +85,11 @@ int main(){
 	struct room* myrooms = (struct room*) malloc(7 * sizeof(struct room));
 	char* dirname = calloc(25, sizeof(char));
 	memset(dirname, '\0', 25);	//get rooms from files into array
-	//create mutex
-//	pthread_mutex_t tmutex = PTHREAD_MUTEX_INITIALIZER;
 	//lock mutex	
 	pthread_mutex_lock(&tmutex);
 	//create thread
-//	pthread_t tthread;
 	pthread_create(&tthread, NULL, TimeFunct, NULL);
 				
-	
 	//create room structs
 	struct room rm0;
 	rm0.id = 0;
@@ -427,7 +435,7 @@ void PrintToScreen(struct room current){
 	int i = 0;
 	
 	//start prompts
-	printf("CURRENT LOCATION: %s\nPOSSIBLE CONNECTIONS:", current.name);
+	printf("\nCURRENT LOCATION: %s\nPOSSIBLE CONNECTIONS:", current.name);
 	
 	//loop through connections
 	for(i; i < current.cnct; i++)
@@ -450,7 +458,11 @@ void PrintToScreen(struct room current){
 * the user the current room info, asks again for input, and restarts the process*
 ********************************************************************************/
 int ParseInput(char* input, struct room* rooms, int id){
-	int valid = 0;
+	int valid = 0, i = 0, match = 0;
+	;FILE *fname = NULL;
+	char* file = "currentTime.txt";
+	char line[50];
+	memset(line, '\0', 50);
 	char info[11];		//info wanted from line
 	memset(info, '\0', 11);
 	size_t bfsize = 50;
@@ -462,20 +474,26 @@ int ParseInput(char* input, struct room* rooms, int id){
 		//cuts off extra characters in buffer for comparison
 		sscanf(input,"%s", info);
 
+		for(i; i < rooms[id].cnct; i++)
+		{
+			if(strcmp(rooms[id].cnctnames[i], info)==0)
+				match = 1;
+		}
+		
 		//determine which room user indicated
-		if(strcmp(rooms[0].name, info)==0)
+		if(strcmp(rooms[0].name, info)==0 && match == 1)
 			return 0;
-		else if(strcmp(rooms[1].name, info)==0)
+		else if(strcmp(rooms[1].name, info)==0 && match == 1)
 			return 1;
-		else if(strcmp(rooms[2].name, info)==0)
+		else if(strcmp(rooms[2].name, info)==0 && match == 1)
 			return 2;
-		else if(strcmp(rooms[3].name, info)==0)
+		else if(strcmp(rooms[3].name, info)==0 && match == 1)
 			return 3;
-		else if(strcmp(rooms[4].name, info)==0)
+		else if(strcmp(rooms[4].name, info)==0 && match == 1)
 			return 4;
-		else if(strcmp(rooms[5].name, info)==0)
+		else if(strcmp(rooms[5].name, info)==0 && match == 1)
 			return 5;
-		else if(strcmp(rooms[6].name, info)==0)
+		else if(strcmp(rooms[6].name, info)==0 && match == 1)
 			return 6;
 		//user wants to check time
 		else if(strcmp(info, "time")==0)
@@ -490,6 +508,13 @@ int ParseInput(char* input, struct room* rooms, int id){
 			//create new time thread
 			pthread_create(&tthread, NULL, TimeFunct, NULL);
 		
+			//print time to screen
+			fname = fopen(file, "r");		
+			while(fgets(line,sizeof(line), fname) != NULL)
+			{
+				printf("\n%s", line);
+			}	
+			printf("\n");
 			//back to program after time finishes	
 			printf("\nWHERE TO? >");
 			valid = 1;
@@ -505,6 +530,9 @@ int ParseInput(char* input, struct room* rooms, int id){
 			getline(&buffer, &bfsize, stdin);
 			input = buffer;
 		}
+		//reset
+		i = 0;
+		match = 0;
 	}
 	while(valid == 1);
 }
